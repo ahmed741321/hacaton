@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Admin Dashboard">
+    <meta name="keywords" content="Admin Dashboard">
+    <meta name="author" content="Admin Dashboard">
+    <link rel="icon" type="image/png" href="/image/icon.png" />
+    <link href="/css/lib/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/lib/all.min.css">
+    <link href="/css/dashboard.css" rel="stylesheet" />
+
+    <style>
+        /* CSS styles for the layout */
+        .sidebar {
+            width: 250px;
+        }
+
+        .table-container {
+            margin-top: 20px;
+        }
+
+        .table {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            border-radius: 5px;
+            background-color: #0056b3;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex" style="width: 100%; height: 100%">
+        <nav id="sidebar" class="sidebar bg-dark text-light">
+            <div class="d-flex flex-column h-100">
+                <div class="p-3 flex-grow-1">
+                    <h4 class="text-center">Dashboard</h4>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/admin/index.html">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/profile.html">
+                                <i class="fas fa-user"></i> Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/reservoir.html">
+                                <i class="fas fa-book"></i> Reservoir
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/search.html">
+                                <i class="fas fa-search"></i> Search
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/manage-tests.html">
+                                <i class="fas fa-clipboard"></i> Manage Tests
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="/admin/correct-tests.html">
+                                <i class="fas fa-check-circle"></i> Correct Tests
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/messages.html">
+                                <i class="fas fa-envelope"></i> Messages
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/settings.html">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-3">
+                    <a class="nav-link" href="/login.html">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content flex-grow-1 p-4">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="donotcross">Dashboard</h2>
+                <button id="sidebarToggleDesktop" class="btn btn-light btn-sm sidebar-toggle-btn"
+                    aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <form id="searchForm">
+                <div class="form-group">
+                    <label for="latitude">Latitude (Y):</label>
+                    <input type="text" class="form-control" id="latitude" placeholder="Enter latitude" required>
+                </div>
+                <div class="form-group">
+                    <label for="longitude">Longitude (X):</label>
+                    <input type="text" class="form-control" id="longitude" placeholder="Enter longitude" required>
+                </div>
+                <button type="submit" onclick="searchDams(event)" class="btn btn-primary">Search</button>
+            </form>
+            <button id="getLocation" class="btn btn-primary">Get Location</button>
+            <p id="location"></p>
+            <!-- Table for displaying lakes -->
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Reservoir Name</th>
+                        <th>Longitude (X)</th>
+                        <th>Latitude (Y)</th>
+                        <th>Distance (km)</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody id="damsList">
+                    <!-- Results will be appended here -->
+                </tbody>
+            </table>
+        </main>
+
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="/js/lib/jquery.min.js"></script>
+    <script src="/js/lib/popper.min.js"></script>
+    <script src="/js/lib/bootstrap.min.js"></script>
+    <!-- Custom JS -->
+    <script type="module" src="/../js/dashboard.js"></script>
+
+    <script>
+        const dams = [
+            { damName: "Sallente", longitude: 0.991459934, latitude: 42.500370969, type: "Screen dam" },
+            { damName: "Cazalegas", longitude: -4.706248048, latitude: 40.01298709, type: "Concrete screen dam" },
+            { damName: "Las Torcas", longitude: -1.087446986, latitude: 41.294686266, type: "Gravity dam" },
+            { damName: "Brovales", longitude: -6.695880465, latitude: 38.345277652, type: "Buttress dam" }
+        ];
+
+        document.getElementById('getLocation').addEventListener('click', function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById('location').innerText = "Geolocation غير مدعوم في هذا المتصفح.";
+            }
+        });
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            document.getElementById('location').innerText = `خط العرض: ${lat}, خط الطول: ${lon}`;
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lon;
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById('location').innerText = "تم رفض الإذن.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById('location').innerText = "معلومات الموقع غير متاحة.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById('location').innerText = "انتهى وقت الطلب.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById('location').innerText = "حدث خطأ غير معروف.";
+                    break;
+            }
+        }
+
+        function haversineDistance(coords1, coords2) {
+            const R = 6371; // Radius of the Earth in km
+            const dLat = (coords2.y - coords1.y) * Math.PI / 180;
+            const dLon = (coords2.x - coords1.x) * Math.PI / 180;
+
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(coords1.y * Math.PI / 180) * Math.cos(coords2.y * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in km
+        }
+
+        function searchDams(event) {
+            event.preventDefault(); // Prevent page reload
+            const x = parseFloat($("#longitude").val());
+            const y = parseFloat($("#latitude").val());
+
+            const userLocation = { x: x, y: y };
+            const nearbyDams = dams.filter(dam => {
+                const damLocation = { x: dam.longitude, y: dam.latitude };
+                return haversineDistance(userLocation, damLocation) <= 100; // Filter for dams within 100 km
+            });
+
+            // Sort dams by distance
+            nearbyDams.sort((a, b) => {
+                const distanceA = haversineDistance(userLocation, { x: a.longitude, y: a.latitude });
+                const distanceB = haversineDistance(userLocation, { x: b.longitude, y: b.latitude });
+                return distanceA - distanceB; // Sort by ascending distance
+            });
+
+            $("#damsList").empty(); // Clear previous results
+
+            nearbyDams.forEach(dam => {
+                const distance = haversineDistance(userLocation, { x: dam.longitude, y: dam.latitude }).toFixed(2);
+                $("#damsList").append(
+                    `<tr>
+                        <td>${dam.damName}</td>
+                        <td>${dam.longitude}</td>
+                        <td>${dam.latitude}</td>
+                        <td>${distance} km</td>
+                        <td>${dam.type}</td>
+                    </tr>`
+                );
+            });
+
+            if (nearbyDams.length === 0) {
+                $("#damsList").append(
+                    `<tr><td colspan="5" class="text-center">No nearby dams found.</td></tr>`
+                );
+            }
+        }
+    </script>
+</body>
+
+</html>

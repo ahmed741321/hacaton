@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+
+  <!-- تفعيل متصفح Edge لتحسين الأداء -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--meta Description-->
+  <meta name="description" content="Admin Dashboard">
+
+  <!-- meta keyword -->
+  <meta name="keywords" content="Admin Dashboard">
+
+  <!-- meta author -->
+  <meta name="author" content="Admin Dashboard">
+
+  <!-- Page icon -->
+  <link rel="icon" type="image/png" href="/image/icon.png" />
+  <!-- Bootstrap CSS -->
+  <link href="/css/lib/bootstrap.min.css" rel="stylesheet" />
+  <!-- FontAwesome CSS -->
+  <link rel="stylesheet" href="/css/lib/all.min.css">
+
+  <!-- Custom CSS -->
+  <link href="/css/dashboard.css" rel="stylesheet" />
+
+  <style>
+    .sidebar {
+      width: 250px;
+    }
+
+    .ag-courses_item {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .ag-courses-item_title {
+      font-weight: bold;
+    }
+
+    .progress-bar {
+      height: 1.5rem;
+    }
+
+    /* Ensure sufficient contrast */
+    .btn-primary {
+      background-color: #007bff;
+      border: none;
+      color: #fff;
+      /* Ensure text color is accessible */
+    }
+
+    .progress-bar.bg-success {
+      background-color: #28a745;
+    }
+
+    .progress-bar.bg-warning {
+      background-color: #ffc107;
+    }
+
+    .progress-bar.bg-danger {
+      background-color: #dc3545;
+    }
+
+    .picture-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 290px;
+    }
+
+    .picture {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 20px;
+      border: 5px solid #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .total-data-container-card {
+
+      display: flex;
+      justify-content: space-around;
+      align-items: stretch;
+      flex-wrap: wrap;
+      gap: 3px;
+      text-align: center;
+
+    }
+
+    .btn-primary {
+      border-radius: 5px;
+      background-color: #0056b3;
+      /* لون خلفية داكن أكثر */
+      color: #ffffff;
+      /* لون النص أبيض */
+    }
+
+    .btn-success {
+      background-color: #1e7e34;
+      /* خلفية خضراء */
+      color: #ffffff;
+      /* نص أبيض */
+    }
+
+
+    .btn-primary:hover {
+      box-shadow: 0 4px 8px rgba(230, 229, 229, 0.4);
+    }
+
+    .count-container {
+      margin-top: 15px;
+    }
+
+    .data-count {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #007bff;
+      /* Blue color for the counter */
+    }
+
+    .count-label {
+      font-size: 1rem;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="d-flex" style="width: 100%; height: 100%">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar bg-dark text-light">
+      <div class="d-flex flex-column h-100">
+        <div class="p-3 flex-grow-1">
+          <h4 class="text-center">Dashboard</h4>
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active" href="/admin/index.html">
+                <i class="fas fa-home"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/profile.html">
+                <i class="fas fa-user"></i> Profile
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/reservoir.html.html">
+                <i class="fas fa-book"></i> reservoir
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/search.html">
+                  <i class="fas fa-search"></i> search
+              </a>
+          </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/manage-tests.html">
+                <i class="fas fa-clipboard"></i> Manage Tests
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link " href="/admin/correct-tests.html">
+                <i class="fas fa-check-circle"></i> Correct Tests
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/messages.html">
+                <i class="fas fa-envelope"></i> Messages
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/settings.html">
+                <i class="fas fa-cog"></i> Settings
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="p-3">
+          <a class="nav-link" href="/login.html">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content flex-grow-1 p-4">
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="donotcross">Dashboard</h2>
+
+        <!-- Sidebar Toggle Button -->
+        <button id="sidebarToggleDesktop" class="btn btn-light btn-sm sidebar-toggle-btn" aria-label="Toggle sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
+      <!-- Products Table -->
+      <div class="table-responsive mt-4" style="height: 400px;">
+        <table class="table table-bordered table-hover" style="overflow-x: auto;height: 400px">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ambito Nombre</th>
+              <th>Embalse Nombre</th>
+              <th>Agua Total</th>
+              <th>Electrico Flag</th>
+              <th>Codigo</th>
+              <th>Nombre</th>
+              <th>Embalse</th>
+              <th>X</th>
+              <th>Y</th>
+              <th>Demarc</th>
+              <th>Provincia</th>
+              <th>CCAA</th>
+              <th>Tipo</th>
+              <th>Informe</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="productsTable">
+            <!-- AJAX content will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+  </div>
+  <style>
+    .table {
+      width: 400px;
+      border-collapse: collapse;
+      overflow-x: scroll;
+    }
+
+    .table th,
+    .table td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ddd;
+      white-space: nowrap;
+    }
+
+    .table th {
+      background-color: #f4f4f4;
+      color: #333;
+      white-space: nowrap;
+
+    }
+  </style>
+  <!-- Bootstrap JS and dependencies -->
+  <script src="/js/lib/jquery.min.js"></script>
+  <script src="/js/lib/popper.min.js"></script>
+  <script src="/js/lib/bootstrap.min.js"></script>
+  <!-- Custom JS -->
+  <script type="module" src="/../js/dashboard.js"></script>
+  <script>
+
+
+    // AJAX request to fetch BasicInfo data
+    $.ajax({
+      url: 'http://localhost:8000/api/basicinfo', // ضع هنا مسار الـ API الخاص بـ BasicInfo
+      type: 'GET',
+      dataType: 'json',
+      success: function (response) {
+        // استجابة ناجحة: تعبئة الجدول
+        var tableBody = $('#productsTable');
+        tableBody.empty(); // تنظيف الجدول أولاً
+
+        response.forEach(function (info) {
+          var row = '<tr>' +
+            '<td>' + info.id + '</td>' +
+            '<td>' + info.ambitoNombre + '</td>' +
+            '<td>' + info.embalseNombre + '</td>' +
+            '<td>' + info.aguaTotal + '</td>' +
+            '<td>' + info.electricoFlag + '</td>' +
+            '<td>' + info.codigo + '</td>' +
+            '<td>' + info.nombre + '</td>' +
+            '<td>' + info.embalse + '</td>' +
+            '<td>' + info.x + '</td>' +
+            '<td>' + info.y + '</td>' +
+            '<td>' + info.demarc + '</td>' +
+            '<td>' + info.provincia + '</td>' +
+            '<td>' + info.ccaa + '</td>' +
+            '<td>' + info.tipo + '</td>' +
+            '<td>' + info.informe + '</td>' +
+            '<td>' + '<button type="button" onclick="showBasicInfo(' + info.id + ')" class="btn btn-info">show</button>' + '</td>' +
+            '</tr>';
+          tableBody.append(row);
+        });
+      },
+      error: function () {
+        console.error('Error fetching BasicInfo data.');
+      }
+    });
+
+
+    function showBasicInfo(id) {
+      {
+        window.location.href = '/admin/reservoir.html?id=' + id;
+      }
+    }
+  </script>
+</body>
+
+</html>
