@@ -65,26 +65,6 @@
                                 <i class="fas fa-search"></i> Search
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/manage-tests.html">
-                                <i class="fas fa-clipboard"></i> Manage Tests
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link " href="/admin/correct-tests.html">
-                                <i class="fas fa-check-circle"></i> Correct Tests
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/messages.html">
-                                <i class="fas fa-envelope"></i> Messages
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin/settings.html">
-                                <i class="fas fa-cog"></i> Settings
-                            </a>
-                        </li>
                     </ul>
                 </div>
                 <div class="p-3">
@@ -112,9 +92,9 @@
                     <label for="longitude">Longitude (X):</label>
                     <input type="text" class="form-control" id="longitude" placeholder="Enter longitude" required>
                 </div>
-                <button type="submit" onclick="searchDams(event)" class="btn btn-primary">Search</button>
+                <button type="button" onclick="searchDams()" class="btn btn-primary">Search</button>
+                <button id="getLocation" class="btn btn-primary">Get Location</button>
             </form>
-            <button id="getLocation" class="btn btn-primary">Get Location</button>
             <p id="location"></p>
             <!-- Table for displaying lakes -->
             <table class="table table-bordered">
@@ -124,7 +104,6 @@
                         <th>Longitude (X)</th>
                         <th>Latitude (Y)</th>
                         <th>Distance (km)</th>
-                        <th>Type</th>
                     </tr>
                 </thead>
                 <tbody id="damsList">
@@ -132,107 +111,91 @@
                 </tbody>
             </table>
         </main>
-
     </div>
 
     <!-- Bootstrap JS and dependencies -->
     <script src="/js/lib/jquery.min.js"></script>
     <script src="/js/lib/popper.min.js"></script>
     <script src="/js/lib/bootstrap.min.js"></script>
+
     <!-- Custom JS -->
-    <script type="module" src="/../js/dashboard.js"></script>
-
     <script>
-        const dams = [
-            { damName: "Sallente", longitude: 0.991459934, latitude: 42.500370969, type: "Screen dam" },
-            { damName: "Cazalegas", longitude: -4.706248048, latitude: 40.01298709, type: "Concrete screen dam" },
-            { damName: "Las Torcas", longitude: -1.087446986, latitude: 41.294686266, type: "Gravity dam" },
-            { damName: "Brovales", longitude: -6.695880465, latitude: 38.345277652, type: "Buttress dam" }
-        ];
 
-        document.getElementById('getLocation').addEventListener('click', function () {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                document.getElementById('location').innerText = "Geolocation غير مدعوم في هذا المتصفح.";
-            }
-        });
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const EARTH_RADIUS = 6371; // نصف قطر الأرض بالكيلومترات
 
-        function showPosition(position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            document.getElementById('location').innerText = `خط العرض: ${lat}, خط الطول: ${lon}`;
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lon;
-        }
+            // تحويل درجات الخطوط إلى راديان
+            const lat1Rad = lat1 * (Math.PI / 180);
+            const lon1Rad = lon1 * (Math.PI / 180);
+            const lat2Rad = lat2 * (Math.PI / 180);
+            const lon2Rad = lon2 * (Math.PI / 180);
 
-        function showError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    document.getElementById('location').innerText = "تم رفض الإذن.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    document.getElementById('location').innerText = "معلومات الموقع غير متاحة.";
-                    break;
-                case error.TIMEOUT:
-                    document.getElementById('location').innerText = "انتهى وقت الطلب.";
-                    break;
-                case error.UNKNOWN_ERROR:
-                    document.getElementById('location').innerText = "حدث خطأ غير معروف.";
-                    break;
-            }
-        }
+            // حساب الفروق بين الإحداثيات
+            const deltaLat = lat2Rad - lat1Rad;
+            const deltaLon = lon2Rad - lon1Rad;
 
-        function haversineDistance(coords1, coords2) {
-            const R = 6371; // Radius of the Earth in km
-            const dLat = (coords2.y - coords1.y) * Math.PI / 180;
-            const dLon = (coords2.x - coords1.x) * Math.PI / 180;
-
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(coords1.y * Math.PI / 180) * Math.cos(coords2.y * Math.PI / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            // حساب المسافة باستخدام صيغة هافرسين
+            const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+                Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c; // Distance in km
+
+            // حساب المسافة بالكيلومترات
+            return EARTH_RADIUS * c; // المسافة بالكيلومترات
         }
 
-        function searchDams(event) {
-            event.preventDefault(); // Prevent page reload
-            const x = parseFloat($("#longitude").val());
-            const y = parseFloat($("#latitude").val());
+        // دالة البحث عن البحيرات
+        function searchDams() {
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const distanceLimit = 100; // المسافة القصوى بالكيلومترات
 
-            const userLocation = { x: x, y: y };
-            const nearbyDams = dams.filter(dam => {
-                const damLocation = { x: dam.longitude, y: dam.latitude };
-                return haversineDistance(userLocation, damLocation) <= 100; // Filter for dams within 100 km
+            // استدعاء API لجلب بيانات البحيرات
+            $.ajax({
+                url: 'http://localhost:8000/api/basicinfo', // ضع هنا مسار الـ API الخاص بـ BasicInfo
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+
+                    console.log(response);
+
+                    // تصفية البحيرات القريبة
+                    const nearbyLakes = response.filter(lake => {
+                        const distance = calculateDistance(latitude, longitude, lake.y, lake.x) // استخدام y كخط عرض و x كخط طول
+                        console.log(`Distance: ${distance.toFixed(2)} km`);
+                        return distance <= distanceLimit;
+                    });
+
+
+                    displayLakes(nearbyLakes, latitude, longitude); // تمرير الإحداثيات إلى الدالة
+                },
+                error: function () {
+                    console.error('Error fetching BasicInfo data.');
+                    alert('فشل جلب بيانات البحيرات.');
+                }
             });
+        }
 
-            // Sort dams by distance
-            nearbyDams.sort((a, b) => {
-                const distanceA = haversineDistance(userLocation, { x: a.longitude, y: a.latitude });
-                const distanceB = haversineDistance(userLocation, { x: b.longitude, y: b.latitude });
-                return distanceA - distanceB; // Sort by ascending distance
-            });
+        // دالة لعرض البحيرات في الجدول
+        function displayLakes(lakes, inputLatitude, inputLongitude) {
+            const damsList = document.getElementById('damsList');
+            damsList.innerHTML = ''; // تنظيف النتائج السابقة
 
-            $("#damsList").empty(); // Clear previous results
-
-            nearbyDams.forEach(dam => {
-                const distance = haversineDistance(userLocation, { x: dam.longitude, y: dam.latitude }).toFixed(2);
-                $("#damsList").append(
-                    `<tr>
-                        <td>${dam.damName}</td>
-                        <td>${dam.longitude}</td>
-                        <td>${dam.latitude}</td>
-                        <td>${distance} km</td>
-                        <td>${dam.type}</td>
-                    </tr>`
-                );
-            });
-
-            if (nearbyDams.length === 0) {
-                $("#damsList").append(
-                    `<tr><td colspan="5" class="text-center">No nearby dams found.</td></tr>`
-                );
+            if (lakes.length === 0) {
+                damsList.innerHTML = '<tr><td colspan="4">لا توجد بحيرات قريبة</td></tr>';
+                return;
             }
+
+            lakes.forEach(lake => {
+                const distance = calculateDistance(inputLatitude, inputLongitude, lake.y, lake.x) // استخدام y كخط عرض و x كخط طول
+                const row = `<tr>
+                                <td>${lake.embalseNombre}</td> <!-- أو أي حقل تريده -->
+                                <td>${lake.x}</td>
+                                <td>${lake.y}</td>
+                                <td> ${distance.toFixed(2)} km</td>
+                            </tr>`;
+                damsList.innerHTML += row;
+            });
         }
     </script>
 </body>
